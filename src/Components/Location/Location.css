@@ -1,0 +1,14 @@
+tr:hover {
+  cursor: pointer;
+}
+
+.father {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.page-link {
+  margin-top: 5px !important;
+}

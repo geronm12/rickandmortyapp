@@ -8,7 +8,7 @@ import Loader from "../Loader/Loader";
 
 import { GetFromDataBase } from "../../services/api";
 
-import "../../App.css";
+import "./TarjetasPaginadas.css";
 
 //ciclo de vida
 //Mount
@@ -17,11 +17,19 @@ import "../../App.css";
 function TarjetasPaginadas() {
   const [resultado, setResultado] = useState([]);
   const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setIsLoading(true);
     GetFromDataBase(page)
-      .then(({ results }) => setResultado(results))
-      .catch((err) => console.log(err));
+      .then(({ results }) => {
+        setResultado(results);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsLoading(false);
+      });
   }, [page]);
 
   function AddPage() {
@@ -32,14 +40,20 @@ function TarjetasPaginadas() {
     }
   }
 
+  function DeletePage() {
+    setPage(page - 1);
+  }
+
   return (
     <div className="App">
-      <Pagination>
-        <Pagination.Prev onClick={() => setPage(page - 1)}></Pagination.Prev>
-        <Pagination.Next onClick={() => AddPage()}></Pagination.Next>
-      </Pagination>
+      {!isLoading && (
+        <Pagination>
+          <Pagination.Prev onClick={DeletePage}></Pagination.Prev>
+          <Pagination.Next onClick={AddPage}></Pagination.Next>
+        </Pagination>
+      )}
       <Container className="contenedor-tarjetas">
-        {resultado.length === 0 ? (
+        {isLoading ? (
           <Loader />
         ) : (
           resultado.map((element, index) => (
@@ -47,6 +61,7 @@ function TarjetasPaginadas() {
               name={element.name}
               image={element.image}
               key={index}
+              id={element.id}
             />
           ))
         )}
