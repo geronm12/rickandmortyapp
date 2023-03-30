@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./App.css";
 import PageNavbar from "./Components/Navbar/PageNavbar";
+import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute";
 import { CONSTANTS } from "./configurations/constants";
+import { DataContext, DataProvider } from "./context/DataContext";
 import { CharactersId } from "./pages/CharactersId";
 import { CharactersPage } from "./pages/CharactersPage";
 import { EpisodesPage } from "./pages/EpisodesPage";
@@ -13,37 +15,49 @@ import { LoginPage } from "./pages/LoginPage";
 import { GetItem } from "./services/local-storage";
 
 function App() {
-  const [{ isLogged, token }, setIsLogged] = useState({
-    isLogged: false,
-    token: "",
-  });
-
-  useEffect(() => {
-    const item = GetItem(CONSTANTS.USER_KEY);
-    if (item) {
-      setIsLogged({
-        isLogged: true,
-        token: item,
-      });
-    }
-  }, []);
-
-  if (!isLogged) {
-    return <LoginPage setIsLogged={setIsLogged}></LoginPage>;
-  }
-
   return (
-    <BrowserRouter>
-      <PageNavbar />
-      <Routes>
-        <Route path="/" element={<HomePage isLogged={isLogged} />}></Route>
-        <Route path="/characters" element={<CharactersPage />}></Route>
-        <Route path="/characters/:id" element={<CharactersId />}></Route>
-        <Route path="/location" element={<LocationsPage />}></Route>
-        <Route path="/episodes" element={<EpisodesPage />}></Route>
-        <Route path="*" element={<ErrorPage />}></Route>
-      </Routes>
-    </BrowserRouter>
+    <DataContext>
+      <BrowserRouter>
+        <PageNavbar />
+        <Routes>
+          <Route path="/login" element={<LoginPage />}></Route>
+          <Route path="/" element={<HomePage />}></Route>
+          <Route
+            path="/characters"
+            element={
+              <ProtectedRoute>
+                <CharactersPage />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="/characters/:id"
+            element={
+              <ProtectedRoute>
+                <CharactersId />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="/location"
+            element={
+              <ProtectedRoute>
+                <LocationsPage />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route
+            path="/episodes"
+            element={
+              <ProtectedRoute>
+                <EpisodesPage />
+              </ProtectedRoute>
+            }
+          ></Route>
+          <Route path="*" element={<ErrorPage />}></Route>
+        </Routes>
+      </BrowserRouter>
+    </DataContext>
   );
 }
 

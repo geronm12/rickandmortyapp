@@ -1,10 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate } from "react-router-dom";
+import { DataProvider } from "../context/DataContext";
 
 export const HomePage = ({ isLogged }) => {
-  if (!isLogged) {
-    return <Navigate to="/"> </Navigate>;
-  }
-
   return <div>HomePage</div>;
 };

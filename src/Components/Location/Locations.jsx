@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { GetFromDataBaseLocation } from "../../services/api";
 
 import Pagination from "react-bootstrap/Pagination";
@@ -7,6 +7,7 @@ import Table from "react-bootstrap/Table";
 import Loader from "../Loader/Loader";
 
 import "./Location.css";
+import { DataProvider } from "../../context/DataContext";
 
 export const Locations = () => {
   const [resultado, setResultado] = useState([]);
@@ -26,7 +27,6 @@ export const Locations = () => {
         setResultado(results);
       })
       .catch((err) => console.log(err));
-    console.log(resultado);
   }, [page]);
   return (
     <div className="father">
@@ -49,7 +49,7 @@ export const Locations = () => {
           ) : (
             resultado.map((element, index) => {
               return (
-                <tr>
+                <tr key={index}>
                   <td> </td>
                   <td>{element.name}</td>
                   <td>{element.type}</td>

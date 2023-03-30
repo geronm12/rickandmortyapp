@@ -1,11 +1,25 @@
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"; //ContextApi
 import jwt_decode from "jwt-decode";
 import { SignInWithGitHub } from "../services/firebase-config";
 import { CONSTANTS } from "../configurations/constants";
-import { AddItem } from "../services/local-storage";
+import { AddItem, GetItem } from "../services/local-storage";
+import { DataProvider } from "../context/DataContext";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export const LoginPage = ({ setIsLogged }) => {
+export const LoginPage = () => {
+  const { sesion } = useContext(DataProvider);
+  const navigate = useNavigate();
+  const { state } = useLocation();
+
+  useEffect(() => {
+    const item = GetItem(CONSTANTS.USER_KEY);
+    if (item) {
+      sesion.setIsLogged(true);
+      navigate(state ? state.pathname : "/");
+    }
+  }, []);
+
   return (
     <GoogleOAuthProvider clientId={CONSTANTS.GOOGLE_CLIENT}>
       <button
@@ -13,7 +27,8 @@ export const LoginPage = ({ setIsLogged }) => {
           SignInWithGitHub()
             .then((result) => {
               AddItem(CONSTANTS.USER_KEY, result);
-              setIsLogged(true);
+              sesion.setIsLogged(true);
+              navigate(state ? state.pathname : "/");
             })
             .catch((err) => console.log(err));
         }}
@@ -24,10 +39,12 @@ export const LoginPage = ({ setIsLogged }) => {
         onSuccess={({ credential }) => {
           const resultado = jwt_decode(credential);
           AddItem(CONSTANTS.USER_KEY, resultado);
-          setIsLogged(true);
+          sesion.setIsLogged(true);
+          navigate(state ? state.pathname : "/");
         }}
         onError={() => {
-          setIsLogged(false);
+          sesion.setIsLogged(false);
+
           console.log("Login Failed");
         }}
       />
